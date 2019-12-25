@@ -16,7 +16,7 @@ class RegisterView(CreateView):
   model = User
   form_class = RegisterForm
   template_name = 'accounts/register.html'
-  success_url = '/dev/accounts/login'
+  success_url = '/accounts/login'
 
   def form_valid(self, form):
     messages.success(self.request, 'User has been registered successfully!')

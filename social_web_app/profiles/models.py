@@ -67,7 +67,7 @@ class Profile(models.Model):
   name = models.CharField(max_length=100)
   age = models.IntegerField()
   gender = models.CharField(
-    max_length=5,
+    max_length=100,
     default=1,
     choices=GENDER_CHOICES
   )

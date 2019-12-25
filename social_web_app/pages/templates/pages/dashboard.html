@@ -3,6 +3,11 @@
 {% block content %}
 <div class="post-list">
   <h3 class="page-heading">Dashboard</h3>
-  <p class="lead text-muted"> Welcome {{user}}</p>
+  <p class="lead text-muted"> Welcome {{ request.user.email }}</p>
 </div>
+<script type="text/javascript">
+  $(document).ready(function(){
+    $(".dashboard").addClass('active');
+  });
+</script>
 {% endblock content %}
