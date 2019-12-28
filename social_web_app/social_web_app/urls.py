@@ -6,7 +6,7 @@ from django.urls import path, include, re_path
 urlpatterns = [
     re_path(
         r'home/',
-        include('pages.urls','pages')
+        include('pages.urls',namespace='pages')
     ),
     # path(
     #     'dev/',
@@ -14,7 +14,7 @@ urlpatterns = [
     # ),
     path(
         'accounts/',
-        include('accounts.urls', namespace='accounts')
+        include('pages.urls', namespace='pages')
     ),
     path(
         'posts/',

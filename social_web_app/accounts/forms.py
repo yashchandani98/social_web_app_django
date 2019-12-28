@@ -2,8 +2,9 @@
 from django import forms
 from django.db.models import Q
 from django.contrib.auth import get_user_model
+from .models import User
 
-User = get_user_model()
+# User = get_user_model()
 
 
 class RegisterForm(forms.ModelForm):
@@ -64,17 +65,17 @@ class RegisterForm(forms.ModelForm):
 
   class Meta:
     model = User
-    fields = ('email',)
+    fields = ('name','number','email','password1')
 
   def clean_email(self, *args, **kwargs):
     email = self.cleaned_data.get('email')
-    qs = User.objects.filter(email__contains=email)
+    qs = User.objects.filter(email=email)
     if qs.exists():
       raise forms.ValidationError('Email has already been registered!')
     else:
       return email
 
-  def clean_password2(self, *args, **kwargs):
+  def clean_password(self, *args, **kwargs):
     password1 = self.cleaned_data.get('password1')
     password2 = self.cleaned_data.get('password2')
     if password1 and password2 and password1 != password2:
@@ -82,20 +83,31 @@ class RegisterForm(forms.ModelForm):
     else:
       return password2
 
+  def clean_number(self,*args,**kwargs):
+    phone = self.cleaned_data.get('number')
+    qs = User.objects.filter(number=phone)
+    if qs.exists():
+      raise forms.ValidationError('Phone Number has already been registered!')
+    else:
+      return phone
+
   def save(self, commit=True):
-    user = super(RegisterForm, self).save(commit=False)
-    user.set_password(self.cleaned_data['password1'])
+    user = User(email=self.cleaned_data.get('email'),password=self.cleaned_data.get('password1'),name=self.cleaned_data.get('name'),number=self.cleaned_data.get('number'))
+    # raise SystemExit
     if commit:
       user.save()
     return user
 
 
 class LoginForm(forms.Form):
-  email = forms.CharField(
+  number = forms.CharField(
+    label='Phone',
     widget=forms.TextInput(
       attrs={
         'class': 'form-control form-control-lg',
-        'placeholder': 'Enter Email'
+        'placeholder': 'Enter Phone Number',
+        'type': 'number',
+        'autocomplete': 'off'
       }
     )
   )
@@ -109,14 +121,15 @@ class LoginForm(forms.Form):
   )
 
   def clean(self, *args, **kwargs):
-    email = self.cleaned_data.get('email')
+    number = self.cleaned_data.get('number')
     password = self.cleaned_data.get('password')
-    qs = User.objects.filter(email__iexact=email)
+    qs = User.objects.filter(number=number)
     if not qs.exists():
       raise forms.ValidationError('User does not exist!')
     user_obj = qs.first()
-    if not user_obj.check_password(password):
+    # print(user_obj.password)
+    # raise SystemExit
+    if  password!=user_obj.password:
       raise forms.ValidationError('Invalid Credentials!')
     self.cleaned_data['user_obj'] = user_obj
     return super(LoginForm, self).clean(*args, **kwargs)
-2

@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'unlikes',
     'comments',
     'profiles',
-    'crispy_forms'
+    'crispy_forms',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [

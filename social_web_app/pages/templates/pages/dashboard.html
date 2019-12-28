@@ -3,7 +3,7 @@
 {% block content %}
 <div class="post-list">
   <h3 class="page-heading">Dashboard</h3>
-  <p class="lead text-muted"> Welcome {{ request.user.email }}</p>
+  <p class="lead text-muted"> Welcome {{ request.session.name }}</p>
 </div>
 <script type="text/javascript">
   $(document).ready(function(){

@@ -16,13 +16,13 @@ class UserManager(BaseUserManager):
 		user.save(using=self._db)
 		return user
 
-class User(AbstractBaseUser):
+class User(models.Model):
 	email = models.EmailField(max_length=255, unique=True, null=True)
-	admin = models.BooleanField(default=False)
-	staff = models.BooleanField(default=False)
-	active = models.BooleanField(default=True)
 	name = models.CharField(max_length=255,null=False)
 	number = models.CharField(max_length=10,null=False)
+	password = models.CharField(max_length=1000,null=False)
+	active = models.BooleanField(default=True)
+	# last_login = models.DateTimeField(auto_now_add=True)
 	# print("email",email)
 	objects = UserManager()
 
