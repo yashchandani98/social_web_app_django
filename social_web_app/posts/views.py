@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import View, DetailView, UpdateView, DeleteView
+from django.core.files.storage import FileSystemStorage
 
 from .models import Post
 from friends.models import Friends
@@ -63,7 +64,16 @@ class PostListView(View):
       # instance = form.save(commit=False)
       # instance.owner = self.request.session['id']
       # instance.save()
-      model = Post(description=request.POST.get('description'),owner_id=request.session['id'],image='')
+      # request.FILES['image']:
+      if 'image' in request.FILES:
+        myfile = request.FILES['image']
+        fs = FileSystemStorage()
+        filename = fs.save('static/images/'+myfile.name, myfile)
+        uploaded_file_url = '/'+fs.url(filename)
+        # print("uploaded_file_url",uploaded_file_url)
+      else:
+         uploaded_file_url=''
+      model = Post(description=request.POST.get('description'),owner_id=request.session['id'],image=uploaded_file_url)
       model.save()
       messages.success(request, 'Post has been added to feed!')
       return redirect('posts:posts-list')

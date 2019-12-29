@@ -82,9 +82,9 @@ a:hover{
             margin-top: -17px;
             font-size: 15px;">
             {% if post.post.privacy %}
-            <img src="https://img.icons8.com/android/24/000000/user.png" title="My Friends" data-toggle="tooltip" style="cursor:pointer;width:15px;height:15px;margin-left:-25px;">
+            <img src="https://img.icons8.com/android/24/000000/user.png" title="My Friends" data-toggle="tooltip" style="cursor:pointer;width:15px;height:15px;margin-left:-15px;">
             {% else %}
-            <img src="https://img.icons8.com/ios-glyphs/30/000000/globe-earth.png" title="Public  " data-toggle="tooltip" style="cursor:pointer;width:15px;height:15px;margin-left:-25px;"> {% endif %} {{post.date}} at {{post.time}}</div>
+            <img src="https://img.icons8.com/ios-glyphs/30/000000/globe-earth.png" title="Public" data-toggle="tooltip" style="cursor:pointer;width:15px;height:15px;margin-left:-15px;"> {% endif %} {{post.date}} at {{post.time}}</div>
             {% endif %}
           </div>
         </div>
@@ -92,7 +92,7 @@ a:hover{
         <!-- Card image-->
         {% if post.post.image %}
         <!-- <img class="card-img-top" src="https://mdbootstrap.com/img/Photos/Others/girl1.jpg" alt="Card image cap"> -->
-        <img src="{{post.post.image}}" />
+        <img src="{{post.post.image}}" style="max-height:200px;"/>
         {% endif %}
         <!-- Card content -->
         <div class="card-body">
@@ -141,7 +141,7 @@ a:hover{
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <form action="" method="POST"> {% csrf_token %}
+        <form action="" method="POST" enctype="multipart/form-data"> {% csrf_token %}
           <div class="modal-body">
             {{ form|crispy }}
           </div>
