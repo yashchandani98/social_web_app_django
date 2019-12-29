@@ -66,41 +66,67 @@ class LoginView(View):
 
 class ProfileView(View):
   def get(self,request,*args,**kwargs):
+    myProfile = User.objects.get(id=request.GET.get('profileId'))
+    total_mutual=0
+    # myProfile = User.objects.get(Q(received_user=request.GET.get('profileId')) | Q(requested_user=request.GET.get('profileId')),active=True)
+    print("request.session.get('id')",request.session.get('id'))
+    # myFriends = Friends.objects.filter(Q(requested_user=request.session.get('id')) | Q(received_user=request.session.get('id')),active=True)
     friends = Friends.objects.filter(Q(received_user=request.GET.get('profileId')) | Q(requested_user=request.GET.get('profileId')),active=True)
-    print(friends)
-    raise SystemExit
-    flag=0
-    if len(myFriends) == 0:
-      myFriends = Friends.objects.filter(requested_user=request.session.get('id'),active=True)
-      flag=1
-    myProfile = User.objects.get(id=request.session.get('id'))
-    friends = list()
-    for friend in myFriends:
-      if flag==0:
+    allFriends=list()
+    for friend in friends:
+      # print(friend.name)
+      if int(friend.received_user) == int(request.GET.get('profileId')):
         friendDetails = User.objects.get(id=friend.requested_user)
+        is_friend=Friends.objects.filter(Q(received_user=friend.requested_user,requested_user=request.session['id']) | Q(requested_user=friend.requested_user,received_user=request.session['id']),active=True).count()
       else:
         friendDetails = User.objects.get(id=friend.received_user)
-      friends.append({"id":friendDetails.id,"name":friendDetails.name,'requestId':friend.id})
-    return render(request,'pages/myProfile.html',{"myFriends":friends,"totalFriends":len(myFriends),"myProfile":myProfile,"is_my_profile":0})
+        is_friend=Friends.objects.filter(Q(received_user=friend.received_user,requested_user=request.session['id']) | Q(requested_user=friend.received_user,received_user=request.session['id']),active=True).count()
+        # is_friend=Friends.objects.filter(Q(received_user=friend.received_user,requested_user=request.session['id']) | Q(requested_user=friend.received_user,received_user=request.session['id']) | Q(received_user=friend.requested_user,requested_user=request.session['id']) | Q(requested_user=friend.requested_user,received_user=request.session['id']),active=True).count()
+      print("friendDetails",friendDetails.name) 
+      print("is_friend",is_friend)
+      if is_friend is not 0:
+        is_mutual=1
+        total_mutual+=1
+      else:
+        is_mutual=0
+      allFriends.append({"friends":friendDetails,"is_mutual":is_mutual})
+    return render(request,'pages/myProfile.html',{"friends":allFriends,"totalFriends":len(allFriends),"myProfile":myProfile,"is_my_profile":0,"total_mutual":total_mutual})
+      # print(friends)
+    # raise SystemExit
+    # flag=0
+    # if len(myFriends) == 0:
+    #   flag=1
+    # friends = list()
+    # for friend in myFriends:
+    #   if flag==0:
+    #     friendDetails = User.objects.get(id=friend.requested_user)
+    #   else:
+    #     friendDetails = User.objects.get(id=friend.received_user)
+    #   friends.append({"id":friendDetails.id,"name":friendDetails.name,'requestId':friend.id})
 
 class LogoutView(View):
   def get(self, request, *args, **kwargs):
     del request.session['id']
     del request.session['name']
     logout(request)
-    messages.success(request, 'You has been logged out successfully!')
+    messages.success(request, 'You have been logged out successfully!')
     return redirect(reverse('accounts:accounts-login'))
 
 class MyProfileView(View):
   def get(self,request,*args,**kwargs):
     myFriends = Friends.objects.filter(received_user=request.session.get('id'),active=True)
+    friendsList=list()
+    for fr in myFriends:
+      friendsList.append(fr)
     flag=0
-    if len(myFriends) == 0:
-      myFriends = Friends.objects.filter(requested_user=request.session.get('id'),active=True)
+    if len(myFriends) == 0:    
       flag=1
+    myFriends = Friends.objects.filter(requested_user=request.session.get('id'),active=True)
+    for fr in myFriends:
+      friendsList.append(fr)
     myProfile = User.objects.get(id=request.session.get('id'))
     friends = list()
-    for friend in myFriends:
+    for friend in friendsList:
       if flag==0:
         friendDetails = User.objects.get(id=friend.requested_user)
       else:

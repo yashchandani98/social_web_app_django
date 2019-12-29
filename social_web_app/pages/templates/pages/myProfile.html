@@ -4,7 +4,13 @@
 {% block content %}
 <div class="profiles-list">
   <header class="page-header d-flex">
-    <h3 class="page-heading m-0">My Profile</h3>
+    <h3 class="page-heading m-0">
+    {% if is_my_profile == 1 %}
+      My Profile
+    {% else %}
+      Profile
+    {% endif %}
+    </h3>
   </header>
   <hr>
       <div class="card card-posts my-2">
@@ -22,7 +28,16 @@
         </div>
       </div>
   <header class="page-header d-flex">
+    {% if is_my_profile == 1 %}
     <h3 class="page-heading m-0">My Friends ({{totalFriends}})</h3>
+    {% else %}
+    <div class="col-sm-6">
+      <h3 class="page-heading m-0">All Friends ({{totalFriends}})</h3>
+    </div>
+    <div class="col-sm-6">
+      <h3 class="page-heading m-0">Mutual Friends ({{total_mutual}})</h3>
+    </div>
+    {% endif %}
   </header>
   {% if totalFriends == 0 %}
   <p class="lead text-muted">No friend found yet..</p>
@@ -40,6 +55,51 @@
     </div>
   </div>
   {% endfor %}
+  {% else %}
+  <div class="row">
+  <div class="col-sm-6">
+    {% for profile in friends %}
+    <div class="card card-posts my-2">
+      <div class="card-body d-flex">
+        <div class="card-left">
+          <a href="{% url 'accounts:profile-view' %}?profileId={{profile.friends.id}}" class="lead m-0" style="text-decoration:none;">{{profile.friends.name}}</a>
+        </div>
+        {% if profile.friends.id != request.session.id %}
+        <div class="card-right">
+          {% if  profile.is_mutual %}
+            <a href="{% url 'friends:removeFriend' %}?id={{profile.friends.id}}" class="btn btn-outline-primary">Remove Friend</a>
+          {% else %}
+            <a href="{% url 'friends:addfriend' %}?id={{profile.friends.id}}" class="btn btn-outline-primary">Add Friend</a>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="col-sm-6">
+  {% for profile in friends %}
+  {% if  profile.is_mutual %}
+  <div class="card card-posts my-2">
+    <div class="card-body d-flex">
+      <div class="card-left">
+        <a href="{% url 'accounts:profile-view' %}?profileId={{profile.friends.id}}" class="lead m-0" style="text-decoration:none;">{{profile.friends.name}}</a>
+      </div>
+      {% if profile.friends.id != request.session.id %}
+      <div class="card-right">
+        {% if  profile.is_mutual %}
+          <a href="{% url 'friends:removeFriend' %}?id={{profile.friends.id}}" class="btn btn-outline-primary">Remove Friend</a>
+        {% else %}
+          <a href="{% url 'friends:addfriend' %}?id={{profile.friends.id}}" class="btn btn-outline-primary">Add Friend</a>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+  {% endfor %}
+  </div>
+
   {% endif %}
   {% endif %}
 </div>
