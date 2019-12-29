@@ -7,7 +7,6 @@ from django.views.generic import View
 
 from posts.models import Post
 from .models import Like
-from unlikes.models import Unlike
 
 
 # POST LIKE VIEW

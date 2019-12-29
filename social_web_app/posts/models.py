@@ -3,8 +3,8 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
-
-User = get_user_model()
+from accounts.models import User
+# User = get_user_model()
 
 # POST MANAGER
 class PostManager(models.Manager):
@@ -23,20 +23,25 @@ class PostManager(models.Manager):
 
 # POST MODEL
 class Post(models.Model):
-  title = models.CharField(max_length=100)
+  # title = models.CharField(max_length=100)
   description = models.TextField()
   created_at = models.DateTimeField(auto_now_add=True)
-  owner = models.ForeignKey(
-    User,
-    default=1,
-    on_delete=models.CASCADE,
-    null=True
-  )
+  # owner = models.ForeignKey(
+  #   User,
+  #   default=1,
+  #   on_delete=models.CASCADE,
+  #   null=True
+  # )
+  owner_id = models.CharField(null=False,max_length=10,default=1)
+  image = models.ImageField(upload_to='images/',null=True)
+  active = models.BooleanField(default=True)
+  privacy = models.BooleanField(default=True)
+
 
   objects = PostManager()
 
   def __str__(self, *args, **kwargs):
-    return self.title
+    return self.owner_id
 
   def get_absolute_url(self, *args, **kwargs):
     return reverse('posts:posts-detail', kwargs={'id': self.pk})
@@ -49,9 +54,3 @@ class Post(models.Model):
 
   def get_like_url(self, *args, **kwargs):
     return reverse('likes:post-likes', kwargs={'id': self.pk})
-  
-  def get_unlike_url(self, *args, **kwargs):
-    return reverse('unlikes:post-unlikes', kwargs={'id': self.pk})
-
-  def get_comment_create_url(self, *args, **kwargs):
-    return reverse('comments:comments-create', kwargs={'id': self.pk})

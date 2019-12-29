@@ -1,36 +1,132 @@
  
 {% extends 'base.html' %}
+{% load static %}
 {% load crispy_forms_tags %}
 
 {% block content %}
+<style>
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  padding: 5px 10px;
+  z-index: 999;
+  font-size: 15px;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+a:hover{
+  text-decoration: none;
+}
+</style>
 <div class="post-list">
   <header class="page-header d-flex">
     <h3 class="page-heading">Posts Feed</h3>
-    {% if user.is_authenticated %}
+    {% if request.session.id %}
     <button type="button" class="btn btn-success" data-toggle="modal" data-target="#modelId">
       New Post!
     </button>
     {% endif %}
   </header>
   <hr>
-  {% if not posts.exists %}
+  {% if countPosts == 0 %}
   <p class="lead text-muted">No posts added yet..</p>
   {% else %}
   {% for post in posts %}
-  <div class="card card-posts my-2">
-    <div class="card-body d-flex">
-      <div class="card-left">
-        <p class="lead m-0">{{post.title}}</p>
-        <small class="text-muted">Author: {{post.owner.email}}</small>
+  {% if post.post != None %}
+  <!-- Section: Social news card -->
+<section class="my-5">
+
+  <!-- Grid row -->
+  <div class="row">
+    <div class="col-md-3"></div>
+
+    <!-- Grid column -->
+    <div class="col-md-6 col-lg-4">
+
+      <!-- Card -->
+      <div class="card news-card">
+
+        <!-- Heading-->
+        <div class="card-body">
+          <div class="content">
+            <img src="{% static 'images/userdefault.jpg' %}"  style="width: 15%;height: 15%;" class="rounded-circle avatar-img z-depth-1-half">
+            {% if post.ownerId != post.sessionId %}
+              <a href="{% url 'accounts:profile-view' %}?profileId={{post.owner.id}}" style="text-decoration:none;">
+              {% else %}
+              <a href="{% url 'accounts:myProfile' %}" style="text-decoration:none;">
+                {% endif %}
+              {{post.owner.name}}</a>
+           {% if post.ownerId == post.sessionId %}
+            <span class="dropdown" style="float:right;font-size:30px;cursor:pointer;">...
+              <div class="dropdown-content">
+            {% if post.post.privacy %}
+                <a href="{% url 'posts:changePrivacy' %}?privacy=0&id={{post.post.id}}">Make post public</a>
+            {% else %}
+                <a href="{% url 'posts:changePrivacy' %}?privacy=1&id={{post.post.id}}">Make post private</a>
+            {% endif %}
+                <a href="{% url 'posts:deletePost' %}?privacy=0&id={{post.post.id}}" >Delete this post</a>
+                </div>
+            </span>
+            {% endif %}
+            <div class="right-side-meta" style="margin-left: 64px;
+            margin-top: -17px;
+            font-size: 15px;">
+            {% if post.post.privacy %}
+            <img src="https://img.icons8.com/android/24/000000/user.png" title="My Friends" data-toggle="tooltip" style="cursor:pointer;width:15px;height:15px;margin-left:-25px;">
+            {% else %}
+            <img src="https://img.icons8.com/ios-glyphs/30/000000/globe-earth.png" title="Public  " data-toggle="tooltip" style="cursor:pointer;width:15px;height:15px;margin-left:-25px;"> {% endif %} {{post.date}} at {{post.time}}</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Card image-->
+        {% if post.post.image %}
+        <!-- <img class="card-img-top" src="https://mdbootstrap.com/img/Photos/Others/girl1.jpg" alt="Card image cap"> -->
+        <img src="{{post.post.image}}" />
+        {% endif %}
+        <!-- Card content -->
+        <div class="card-body">
+
+          <!-- Social meta-->
+          <div class="social-meta">
+            <p>{{post.post.description}}</p>
+            {% if post.is_liked > 0%}
+              <a href="{% url 'posts:unlikePost' %}?id={{post.post.id}}" id="unlikePost" style="cursor:pointer;font-size: 20px;">❤</a>
+            {% else %}
+              <a href="{% url 'posts:likePost' %}?id={{post.post.id}}" id="likePost" style="cursor:pointer;font-size: 20px;">♡</a>
+             {% endif %}
+              {{post.totalLikes}} likes</span>
+            <!-- <p><b style="cursor:pointer;size:200%;font-size: 20px;">♡</b>13 comments</p> -->
+          </div>
+          <hr>
+          <!-- <div class="md-form">
+            <i class="far fa-heart prefix"></i>
+            <input placeholder="Add Comment..." type="text" id="form5" class="form-control">
+          </div> -->
+
+        </div>
+
       </div>
-      <div class="card-right">
-        <a href="{{post.get_like_url}}" class="btn btn-sm">Like {{post.like_set.all|length}}</a>
-        <a href="{{post.get_unlike_url}}" class="btn btn-sm">Unlike {{post.unlike_set.all|length}}</a>
-        <a href="{{post.get_absolute_url}}" class="btn btn-outline-primary ml-3">Explore
-          {{post.comment_set.all|length}}</a>
-      </div>
+      <!-- Card -->
+
     </div>
+    <div class="col-md-3"></div>
+    <!-- Grid column -->
+
   </div>
+  <!-- Grid row -->
+
+</section>
   {% endfor %}
   {% endif %}
 
@@ -58,9 +154,53 @@
     </div>
   </div>
 </div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script type="text/javascript">
   $(document).ready(function(){
     $(".post").addClass('active');
   });
+          // var is_liked = "{{post.is_liked}}"
+          // // console.log("is_liked","{{post.is_liked}}")
+          // if(is_liked==0){
+          //   $("#likePost").show()
+          //   $("#unlikePost").hide()
+          // }
+          // else{
+          //   $("#likePost").show()
+          //   $("#unlikePost").hide()
+          // }
+          // console.log(is_liked)
+          // $("#likePost").click(function(){
+          //   // $.post("posts:likePost/",{},function(data){
+
+          //   // })
+          //     $.ajax({
+          //       url: 'posts:likePost/',
+          //       data: {
+          //        id:1 
+          //       },
+          //       type:'post',
+          //       dataType: 'json',
+          //       success: function (data) {
+          //         if (data.is_taken) {
+          //           alert("A user with this username already exists.");
+          //         }
+          //       }
+          //     });
+          // })
+          // $("#unlikePost").click(function(){
+          //     $.ajax({
+          //       url: '/post/unlikePost/',
+          //       data: {
+          //         'username': username
+          //       },
+          //       dataType: 'json',
+          //       success: function (data) {
+          //         if (data.is_taken) {
+          //           alert("A user with this username already exists.");
+          //         }
+          //       }
+          //     });
+          // })
 </script>
 {% endblock content %}

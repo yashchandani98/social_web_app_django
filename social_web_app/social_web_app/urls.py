@@ -14,7 +14,7 @@ urlpatterns = [
     # ),
     path(
         'accounts/',
-        include('pages.urls', namespace='pages')
+        include('accounts.urls', namespace='accounts')
     ),
     path(
         'posts/',
@@ -25,16 +25,8 @@ urlpatterns = [
         include('likes.urls', namespace='likes')
     ),
     path(
-        'posts/',
-        include('unlikes.urls', namespace='unlikes')
-    ),
-    path(
-        'posts/',
-        include('comments.urls', namespace='comments')
-    ),
-    path(
-        'profiles/',
-        include('profiles.urls', namespace='profiles')
+        'friends/',
+        include('friends.urls', namespace='profiles')
     ),
     path('admin/', admin.site.urls),
 ]

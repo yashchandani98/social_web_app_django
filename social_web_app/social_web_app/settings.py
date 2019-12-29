@@ -41,11 +41,10 @@ INSTALLED_APPS = [
     'posts',
     'pages',
     'likes',
-    'unlikes',
-    'comments',
     'profiles',
     'crispy_forms',
-    'rest_framework'
+    'rest_framework',
+    'friends'
 ]
 
 MIDDLEWARE = [

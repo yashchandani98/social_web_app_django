@@ -1,0 +1,49 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="profiles-list">
+  <header class="page-header d-flex">
+    <h3 class="page-heading m-0">My Profile</h3>
+  </header>
+  <hr>
+      <div class="card card-posts my-2">
+        <div class="card-body d-flex">
+          <div class="card-left">
+            Name:<h3>{{myProfile.name}}</h3>
+            Email:<h5>{{myProfile.email}}</h5>
+            Number:<h5>{{myProfile.number}}</h5>
+          </div>
+          <div class="card-right">
+            <!-- <a href="{{profile.get_absolute_url}}" class="btn btn-outline-primary">Accept</a>
+            <a href="{{profile.get_absolute_url}}" class="btn btn-outline-primary">Reject</a> -->
+            <img src="/static/images/userdefault.jpg" class="rounded-circle avatar-img z-depth-1-half">
+          </div>
+        </div>
+      </div>
+  <header class="page-header d-flex">
+    <h3 class="page-heading m-0">My Friends ({{totalFriends}})</h3>
+  </header>
+  {% if totalFriends == 0 %}
+  <p class="lead text-muted">No friend found yet..</p>
+  {% else %}
+  {% if is_my_profile == 1 %}
+  {% for profile in myFriends %}
+  <div class="card card-posts my-2">
+    <div class="card-body d-flex">
+      <div class="card-left">
+        <a href="{% url 'accounts:profile-view' %}?profileId={{profile.requestId}}" class="lead m-0" style="text-decoration:none;">{{profile.name}}</a>
+      </div>
+      <div class="card-right">
+        <a href="{% url 'friends:removeFriend' %}?id={{profile.requestId}}" class="btn btn-outline-primary">Remove friend</a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+  {% endif %}
+  {% endif %}
+</div>
+<script>
+$(".myProfile").addClass('active');
+</script>
+{% endblock content %}

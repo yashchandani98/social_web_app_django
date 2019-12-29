@@ -7,9 +7,9 @@ class IndexView(View):
   def get(self, request, *args, **kwargs):
     return render(request, 'pages/home.html', {})
 
-class DashboardView(LoginRequiredMixin, View):
+class DashboardView(View):
   def get(self, request, *args, **kwargs):
-    raise SystemExit
+    # raise SystemExit
     return render(request, 'pages/dashboard.html', {})
 
 class AboutView(View):

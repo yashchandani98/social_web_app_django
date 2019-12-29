@@ -8,8 +8,9 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 
 from posts.models import Post
+from accounts.models import User
 
-User = get_user_model()
+# User = get_user_model()
 
 
 # Like Manager
@@ -24,18 +25,16 @@ class LikeManager(models.Manager):
 
 # LIKE MODEL
 class Like(models.Model):
-  post = models.ForeignKey(
-    Post,
-    default=1,
-    on_delete=models.CASCADE
-  )
-  owner = models.ForeignKey(
-    User,
-    default=1,
-    on_delete=models.CASCADE
-  )
+  # post = models.ForeignKey(
+  #   Post,
+  #   default=1,
+  #   on_delete=models.CASCADE
+  # )
+  post_id = models.CharField(null=True,max_length=10)
 
-  objects = LikeManager()
+  owner_id = models.CharField(null=True,max_length=10)
+
+  # objects = LikeManager()
 
   def __str__(self, *args, **kwargs):
     return self.post.title

@@ -6,13 +6,15 @@ from django.views.generic import View, CreateView
 from django.contrib import messages
 from django.urls import reverse
 from django.http import JsonResponse
+from django.db.models import Q
 # from datetime import datetime, timedelta
 from rest_framework.views import APIView
 from .models import User
+from friends.models import Friends
 
 from .forms import RegisterForm, LoginForm
 
-User = get_user_model()
+# User = get_user_model()
 
 
 # REGISTRATION VIEW
@@ -55,59 +57,53 @@ class LoginView(View):
       request.session['number'] = user.number
       print(request.session['name'])
       messages.success(request, 'Yay! You just logged in!')
-      return redirect(reverse('pages:dashboard-view'))
+      return redirect(reverse('posts:posts-list'))
       # return redirect('/home/dashboard/')
       # return render(request, "pages/dashboard.html", self.context)
     self.context['title'] = 'Login'
     self.context['form'] = form
     return render(request, self.template_name, self.context)
 
+class ProfileView(View):
+  def get(self,request,*args,**kwargs):
+    friends = Friends.objects.filter(Q(received_user=request.GET.get('profileId')) | Q(requested_user=request.GET.get('profileId')),active=True)
+    print(friends)
+    raise SystemExit
+    flag=0
+    if len(myFriends) == 0:
+      myFriends = Friends.objects.filter(requested_user=request.session.get('id'),active=True)
+      flag=1
+    myProfile = User.objects.get(id=request.session.get('id'))
+    friends = list()
+    for friend in myFriends:
+      if flag==0:
+        friendDetails = User.objects.get(id=friend.requested_user)
+      else:
+        friendDetails = User.objects.get(id=friend.received_user)
+      friends.append({"id":friendDetails.id,"name":friendDetails.name,'requestId':friend.id})
+    return render(request,'pages/myProfile.html',{"myFriends":friends,"totalFriends":len(myFriends),"myProfile":myProfile,"is_my_profile":0})
 
 class LogoutView(View):
   def get(self, request, *args, **kwargs):
+    del request.session['id']
+    del request.session['name']
     logout(request)
     messages.success(request, 'You has been logged out successfully!')
     return redirect(reverse('accounts:accounts-login'))
 
-
-  # class PlayerSignUp(APIView):
-  #   def post(self, request):
-  #       final_data = []
-  #       for player in request.data['data']:
-
-  #         password = base64.b64encode(bytes(player['password'], 'utf-8'))
-  #         password = str(password, 'utf-8')
-  #         add_players_details = ClubPlayers(name=player['name'],
-  #                                           emailId=player['emailId'],
-  #                                           username=player['username'],
-  #                                           password=password,
-  #                                           clubAccessList=player['clubId'],
-  #                                           clubMembershipId=clubMemberShipId,
-  #                                           phoneNumber=player['mobileNumberCode'] + player['mobileNumber'],
-  #                                           profileImage=profileImage,
-  #                                           deviceName=player['deviceName'],
-  #                                           deviceOs=player['deviceOs'],
-  #                                           deviceId=player['deviceId'],
-  #                                           deviceType=player['deviceType'],
-  #                                           appVersion=player['appVersion'],
-  #                                           statusString="Active",
-  #                                           phoneNumberCode=player['mobileNumberCode'],
-  #                                           employeeTypeCode=player['employeeTypeCode'],
-  #                                           status=0,
-  #                                           createdOn=datetime.now().timestamp(),
-  #                                           showOnLeaderBoard=0,
-  #                                           FCMTopic=player['mobileNumber'])
-
-
-  #         add_players_details.save()
-              
-  #             response_message = {
-  #                 "message": "Success",
-  #             }
-  #             return JsonResponse(response_message, safe=False, status=200)
-  #         else:
-  #             response_message = {
-  #                 "message": "Bad Request",
-  #                 "result": []
-  #             }
-  #             return JsonResponse(response_message, safe=False, status=400)
+class MyProfileView(View):
+  def get(self,request,*args,**kwargs):
+    myFriends = Friends.objects.filter(received_user=request.session.get('id'),active=True)
+    flag=0
+    if len(myFriends) == 0:
+      myFriends = Friends.objects.filter(requested_user=request.session.get('id'),active=True)
+      flag=1
+    myProfile = User.objects.get(id=request.session.get('id'))
+    friends = list()
+    for friend in myFriends:
+      if flag==0:
+        friendDetails = User.objects.get(id=friend.requested_user)
+      else:
+        friendDetails = User.objects.get(id=friend.received_user)
+      friends.append({"id":friendDetails.id,"name":friendDetails.name,'requestId':friend.id})
+    return render(request,'pages/myProfile.html',{"myFriends":friends,"totalFriends":len(myFriends),"myProfile":myProfile,"is_my_profile":1})

@@ -13,9 +13,9 @@
     <div class="collapse navbar-collapse" id="collapsibleNavId">
       <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
         {% if request.session.name %}
-        <li class="nav-item dashboard">
+        <!-- <li class="nav-item dashboard">
           <a class="nav-link" href="{% url 'pages:dashboard-view' %}">Dashboard</a>
-        </li>
+        </li> -->
         {% else %}
         <li class="nav-item home">
           <a class="nav-link" href="{% url 'pages:home-view' %}">Home</a>
@@ -24,9 +24,22 @@
         <!-- <li class="nav-item profile">
           <a class="nav-link" href="{% url 'profiles:profiles-list'%}">Profiles</a>
         </li> -->
+        {% if request.session.name %}
         <li class="nav-item post">
-          <a class="nav-link" href="{% url 'posts:posts-list' %}">Posts</a>
+          <a class="nav-link" href="{% url 'posts:posts-list' %}">News Feed</a>
         </li>
+        {% endif %}
+
+        {% if request.session.name %}
+        <li class="nav-item myProfile">
+          <a class="nav-link" href="{% url 'accounts:myProfile' %}">My Profile</a>
+        </li>
+        <li class="nav-item exploreFriends">
+          <a class="nav-link" href="{% url 'friends:explore-friends' %}">Explore Friends</a>
+        </li>
+        {% endif %}
+
+
         <!-- <li class="nav-item about">
           <a class="nav-link" href="{% url 'pages:about-view' %}">About</a>
         </li> -->
